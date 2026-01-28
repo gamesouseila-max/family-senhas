@@ -16,6 +16,9 @@ function createWindow() {
   });
 
   win.loadFile('www/index.html');
+
+  // Proteção Profissional: Bloqueia captura e gravação de tela
+  win.setContentProtection(true);
 }
 
 app.whenReady().then(() => {

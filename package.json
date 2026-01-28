@@ -51,6 +51,7 @@
     "electron-builder": "^26.4.0"
   },
   "dependencies": {
+    "@capacitor-community/privacy-screen": "^6.0.0",
     "electron-updater": "^6.7.3"
   }
 }
