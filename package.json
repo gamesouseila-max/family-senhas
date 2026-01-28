@@ -1,0 +1,42 @@
+{
+  "name": "vault-master-secure",
+  "version": "1.0.0",
+  "description": "Secure Password Vault with Electron",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win",
+    "build:android": "npx cap sync && npx cap open android"
+  },
+  "build": {
+    "appId": "com.vault.master",
+    "productName": "VaultMasterSecure",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "icon": "icon.ico",
+      "target": [
+        "portable",
+        "nsis"
+      ]
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "www/**/*",
+      "icon.ico"
+    ]
+  },
+  "keywords": [],
+  "author": "Antigravity",
+  "license": "ISC",
+  "devDependencies": {
+    "@capacitor/android": "^8.0.2",
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.0.2",
+    "@capacitor/core": "^8.0.2",
+    "electron": "^31.0.0",
+    "electron-builder": "^26.4.0"
+  }
+}

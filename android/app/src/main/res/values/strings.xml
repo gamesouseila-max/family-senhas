@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">VaultMaster</string>
+    <string name="title_activity_main">VaultMaster</string>
+    <string name="package_name">com.vault.master</string>
+    <string name="custom_url_scheme">com.vault.master</string>
+</resources>
