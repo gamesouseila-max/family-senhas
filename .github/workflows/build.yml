@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  release:
+  build-windows:
     runs-on: windows-latest
     permissions:
       contents: write
@@ -28,20 +28,51 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Android APK
-        run: |
-          npx cap sync
-          cd android
-          ./gradlew assembleDebug
-        env:
-          ANDROID_HOME: ${{ runner.tool_cache }}/android-sdk
-
-      - name: Upload Artifacts
+      - name: Upload Windows Artifact
         uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
             dist/*.exe
             dist/*.blockmap
-            android/app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-android:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Android APK
+        run: |
+          npx cap sync
+          cd android
+          ./gradlew assembleDebug -Dorg.gradle.java.home=$JAVA_HOME_17_X64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Android Artifact
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: android/app/build/outputs/apk/debug/app-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
