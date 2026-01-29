@@ -1,6 +1,6 @@
 {
   "name": "vault-master-secure",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Secure Password Vault with Electron",
   "repository": {
     "type": "git",
