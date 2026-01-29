@@ -27,6 +27,19 @@ app.whenReady().then(() => {
   // Check for updates
   autoUpdater.checkForUpdatesAndNotify();
 
+  autoUpdater.on('update-available', () => {
+    console.log('Atualização disponível!');
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    console.log('Atualização baixada. O app será reiniciado.');
+    autoUpdater.quitAndInstall();
+  });
+
+  autoUpdater.on('error', (err) => {
+    console.error('Erro no auto-updater:', err);
+  });
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
