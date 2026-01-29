@@ -341,6 +341,24 @@
                     <option value="Redes Sociais">Redes Sociais</option>
                     <option value="Streaming">Streaming</option>
                 </select>
+                <button class="squeo-button" onclick="exportVault()" title="Exportar Backup Local">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" x2="12" y1="15" y2="3" />
+                    </svg>
+                </button>
+                <button class="squeo-button" onclick="document.getElementById('importFile').click()"
+                    title="Importar Backup Local">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" x2="12" y1="3" y2="15" />
+                    </svg>
+                </button>
+                <input type="file" id="importFile" class="hidden" accept=".vault" onchange="importVault(event)">
                 <button class="squeo-button" onclick="openModal()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -431,10 +449,20 @@
         }
 
         /* INIT */
-        window.onload = () => {
+        window.onload = async () => {
             try {
                 localStorage.getItem(META) ? show('loginView') : show('setupView');
                 checkUpdates();
+
+                // Ativar Proteção de Tela no Android (Capacitor)
+                if (window.Capacitor && window.Capacitor.Plugins.PrivacyScreen) {
+                    try {
+                        await window.Capacitor.Plugins.PrivacyScreen.enable();
+                        console.log("Proteção de tela ativada.");
+                    } catch (e) {
+                        console.warn("Falha ao ativar PrivacyScreen:", e);
+                    }
+                }
             } catch (e) {
                 console.error("Erro na Inicialização:", e);
                 alert("Erro Crítico do Sistema: " + e.message);
@@ -476,6 +504,44 @@
             });
             const target = document.getElementById(v);
             if (target) target.classList.remove('hidden');
+        }
+
+        /* BACKUP SYSTEM */
+        function exportVault() {
+            const meta = localStorage.getItem(META);
+            const data = localStorage.getItem(DATA);
+            if (!meta) return alert("Nada para exportar!");
+
+            const blob = new Blob([JSON.stringify({ meta, data })], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_vault_${new Date().toISOString().slice(0, 10)}.vault`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        async function importVault(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const backup = JSON.parse(e.target.result);
+                    if (!backup.meta || !backup.data) throw new Error("Arquivo inválido");
+
+                    if (confirm("Importar backup irá substituir seus dados atuais. Continuar?")) {
+                        localStorage.setItem(META, backup.meta);
+                        localStorage.setItem(DATA, backup.data);
+                        alert("Backup importado! O sistema será reiniciado.");
+                        location.reload();
+                    }
+                } catch (err) {
+                    alert("Erro ao importar: O arquivo não é um backup válido.");
+                }
+            };
+            reader.readAsText(file);
         }
 
         /* CRYPTO */
